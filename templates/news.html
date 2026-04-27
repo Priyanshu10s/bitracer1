@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}BitTracer — Crypto Chronicle{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+  <div class="max-w-7xl mx-auto px-4 py-12">
+
+    <!-- Header row -->
+    <div class="relative mb-12">
+      <a href="/"
+        class="absolute right-0 top-0 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm">
+        🏠 Home
+      </a>
+      <div class="text-center">
+        <h1 class="text-5xl font-bold text-blue-600 dark:text-blue-400 mb-3">Crypto Chronicle</h1>
+        <p class="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+          Your daily source for cryptocurrency news and insights
+        </p>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
+    <div class="bg-white dark:bg-slate-900 rounded-xl shadow-lg border border-blue-100 dark:border-blue-900 mb-8 p-6">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+        <!-- Search -->
+        <div class="md:col-span-6 relative">
+          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+          <input id="news-search" type="text" placeholder="Search headlines..."
+            oninput="filterNews()"
+            class="w-full pl-9 pr-4 py-2 border border-blue-100 dark:border-blue-900 rounded-lg
+                   dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+        </div>
+
+        <!-- Tag filter -->
+        <div class="md:col-span-3">
+          <select id="tag-filter" onchange="filterNews()"
+            class="w-full py-2 px-3 rounded-lg bg-slate-800 border border-blue-800 text-white
+                   focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="all_tags">All Tags</option>
+          </select>
+        </div>
+
+        <!-- Language filter -->
+        <div class="md:col-span-3">
+          <select id="lang-filter" onchange="onLanguageChange()"
+            class="w-full py-2 px-3 rounded-lg bg-slate-800 border border-blue-800 text-white
+                   focus:outline-none focus:ring-2 focus:ring-blue-500">
+            {% for lang in languages %}
+            <option value="{{ lang.value }}">{{ lang.label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Spinner -->
+    <div id="news-spinner" class="flex justify-center items-center h-40">
+      <div class="w-12 h-12 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
+    </div>
+
+    <!-- Error -->
+    <div id="news-error" class="hidden text-center p-6 rounded-xl bg-red-50 dark:bg-red-900/20
+         text-red-500 border border-red-200 dark:border-red-800 mb-4"></div>
+
+    <!-- News grid -->
+    <div id="news-grid" class="hidden grid grid-cols-1 xl:grid-cols-2 gap-6"></div>
+
+    <!-- Empty state -->
+    <div id="news-empty" class="hidden text-center py-20 text-slate-500">
+      No news articles match your search.
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/news.js') }}"></script>
+{% endblock %}

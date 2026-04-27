@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}BitTracer — Dashboard Stats{% endblock %}
+
+{% block content %}
+<div class="p-4 max-w-7xl mx-auto">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold bg-clip-text text-transparent
+               bg-gradient-to-r from-blue-600 to-indigo-600">
+      Blockchain Dashboard Stats
+    </h1>
+    <a href="/" class="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">
+      ← Home
+    </a>
+  </div>
+
+  <!-- Controls -->
+  <div class="flex flex-wrap gap-3 mb-6">
+    <select id="chain-select"
+      class="border rounded-lg px-3 py-2 dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      {% for chain in chains %}
+      <option value="{{ chain.value }}">{{ chain.label }}</option>
+      {% endfor %}
+    </select>
+
+    <input id="block-height" type="number" placeholder="Enter block height"
+      class="border rounded-lg px-4 py-2 dark:bg-gray-800 dark:border-gray-600
+             focus:outline-none focus:ring-2 focus:ring-blue-500 w-52" />
+
+    <button onclick="fetchBlockStats()"
+      class="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg
+             font-semibold hover:from-blue-600 hover:to-indigo-700 active:scale-95 transition">
+      Fetch Stats 🚀
+    </button>
+  </div>
+
+  <!-- Spinner -->
+  <div id="ds-spinner" class="hidden flex items-center gap-2 text-blue-500 mb-4">
+    <div class="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+    Loading…
+  </div>
+
+  <!-- Error -->
+  <div id="ds-error" class="hidden text-center text-red-500 py-6"></div>
+
+  <!-- Block cards grid -->
+  <div id="block-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6"></div>
+
+  <!-- Detailed view for a single block -->
+  <div id="block-detail" class="hidden mt-4 p-6 bg-gradient-to-r from-blue-50 to-indigo-50
+       dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl shadow-lg">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-indigo-800 dark:text-indigo-300">Block Details</h3>
+      <button onclick="closeDetail()"
+        class="px-3 py-1 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700">
+        ✕ Close
+      </button>
+    </div>
+    <div id="block-detail-grid"
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard_stats.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}BitTracer — Advanced Blockchain Features{% endblock %}
+
+{% block content %}
+<div class="p-4 max-w-7xl mx-auto">
+
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+      Advanced Blockchain Features
+    </h1>
+    <a href="/" class="px-4 py-2 bg-gray-800 text-white rounded-lg text-sm hover:bg-gray-700">
+      ← Home
+    </a>
+  </div>
+
+  <!-- Feature cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+
+    <div onclick="selectFeature('broadcast')"
+      class="feature-card cursor-pointer bg-white dark:bg-gray-800 rounded-2xl shadow p-6 hover:shadow-lg
+             hover:scale-105 active:scale-95 transition-all duration-200 border border-gray-100 dark:border-gray-700">
+      <div class="text-3xl mb-3 animate-spin-slow">📡</div>
+      <h3 class="text-lg font-bold mb-1">Broadcast Transaction</h3>
+      <p class="text-sm text-gray-500">Send a raw transaction to the network</p>
+    </div>
+
+    <div onclick="selectFeature('nodes')"
+      class="feature-card cursor-pointer bg-white dark:bg-gray-800 rounded-2xl shadow p-6 hover:shadow-lg
+             hover:scale-105 active:scale-95 transition-all duration-200 border border-gray-100 dark:border-gray-700">
+      <div class="text-3xl mb-3">💻</div>
+      <h3 class="text-lg font-bold mb-1">Nodes List</h3>
+      <p class="text-sm text-gray-500">View information about network nodes</p>
+    </div>
+
+    <div onclick="selectFeature('stateChanges')"
+      class="feature-card cursor-pointer bg-white dark:bg-gray-800 rounded-2xl shadow p-6 hover:shadow-lg
+             hover:scale-105 active:scale-95 transition-all duration-200 border border-gray-100 dark:border-gray-700">
+      <div class="text-3xl mb-3">🔍</div>
+      <h3 class="text-lg font-bold mb-1">State Changes</h3>
+      <p class="text-sm text-gray-500">Explore blockchain state changes</p>
+    </div>
+  </div>
+
+  <!-- Feature detail panel -->
+  <div id="feature-panel" class="hidden bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
+
+    <h2 id="feature-title" class="text-xl font-bold mb-4"></h2>
+
+    <!-- Description box -->
+    <div id="feature-desc"
+      class="mb-5 p-4 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/40 dark:to-purple-900/40 rounded-xl">
+      <h3 id="feature-desc-title" class="font-semibold mb-1 flex items-center gap-2">ℹ️ <span></span></h3>
+      <p id="feature-desc-body" class="text-sm text-gray-700 dark:text-gray-300"></p>
+    </div>
+
+    <!-- Chain selector -->
+    <div class="mb-4">
+      <label class="block text-sm font-medium mb-1">Blockchain</label>
+      <select id="chain-select"
+        class="border rounded-lg px-3 py-2 dark:bg-gray-700 dark:border-gray-600 w-full sm:w-auto focus:outline-none focus:ring-2 focus:ring-purple-400">
+        {% for chain in chains %}
+        <option value="{{ chain.value }}">{{ chain.label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Broadcast inputs -->
+    <div id="broadcast-inputs" class="hidden">
+      <input id="tx-hex" type="text" placeholder="Enter transaction hex"
+        class="w-full border rounded-lg px-4 py-2 mb-3 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-400" />
+      <button onclick="doBroadcast()"
+        class="px-6 py-2 bg-gradient-to-r from-purple-400 to-pink-600 text-white rounded-full font-bold hover:scale-105 active:scale-95 transition">
+        Broadcast 🚀
+      </button>
+    </div>
+
+    <!-- State changes inputs -->
+    <div id="state-inputs" class="hidden">
+      <input id="block-height-state" type="number" placeholder="Enter block height"
+        class="w-full border rounded-lg px-4 py-2 mb-3 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-400" />
+      <button onclick="doStateChanges()"
+        class="px-6 py-2 bg-gradient-to-r from-purple-400 to-pink-600 text-white rounded-full font-bold hover:scale-105 active:scale-95 transition">
+        Fetch State Changes 🔍
+      </button>
+    </div>
+
+    <!-- Nodes button -->
+    <div id="nodes-inputs" class="hidden">
+      <button onclick="doNodes()"
+        class="px-6 py-2 bg-gradient-to-r from-purple-400 to-pink-600 text-white rounded-full font-bold hover:scale-105 active:scale-95 transition">
+        Fetch Nodes Data 🌐
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div id="adv-spinner" class="hidden mt-4 flex items-center gap-2 text-purple-500">
+      <div class="w-5 h-5 border-2 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+      Loading…
+    </div>
+
+    <!-- Result display -->
+    <div id="result-panel"
+      class="hidden mt-4 p-4 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-xl overflow-auto">
+      <h3 class="font-semibold mb-2 flex items-center gap-2">⚡ Result</h3>
+      <pre id="result-json" class="text-sm whitespace-pre-wrap break-words text-gray-800 dark:text-gray-200 max-h-[500px] overflow-y-auto"></pre>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/advanced.js') }}"></script>
+{% endblock %}

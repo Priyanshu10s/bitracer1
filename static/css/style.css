@@ -1,0 +1,106 @@
+/* BitTracer — Global Styles */
+
+/* ── Smooth dark/light transitions ─────────────────────────────────────── */
+*, *::before, *::after {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.1s ease;
+}
+
+/* ── Dark mode overrides ─────────────────────────────────────────────────  */
+.dark body,
+.dark #app-body {
+  background-color: #111827;
+  color: #f3f4f6;
+}
+
+/* ── Gradient text utility ───────────────────────────────────────────────  */
+.gradient-text {
+  background: linear-gradient(to right, #a855f7, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Slow-spin animation for feature icons ──────────────────────────────  */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+/* ── Card hover lift ─────────────────────────────────────────────────────  */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
+/* ── Scrollbar (webkit) ──────────────────────────────────────────────────  */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #a855f7;
+  border-radius: 4px;
+}
+
+/* ── Loading spinner overlay ─────────────────────────────────────────────  */
+.spinner-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* ── Chart canvas height guard ───────────────────────────────────────────  */
+canvas {
+  max-width: 100%;
+}
+
+/* ── News description overflow ───────────────────────────────────────────  */
+.news-desc {
+  overflow: hidden;
+  transition: max-height 0.35s ease;
+}
+
+/* ── Feature card pulse border on selection ──────────────────────────────  */
+.feature-card.selected {
+  border: 2px solid #a855f7;
+  box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.15);
+}
+
+/* ── Responsive table wrapper ─────────────────────────────────────────────  */
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Input focus ring ────────────────────────────────────────────────────  */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.25);
+}
+
+/* ── Pulse animation for live badge ─────────────────────────────────────  */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+.live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}

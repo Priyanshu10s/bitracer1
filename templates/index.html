@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% block title %}BitTracer — Dashboard{% endblock %}
+
+{% block content %}
+<div class="p-4 max-w-screen-2xl mx-auto">
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <div class="flex flex-wrap justify-between items-center mb-6 gap-3">
+    <h1 class="text-3xl font-bold">
+      <span class="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+        BitTracer
+      </span>
+      <span class="text-sm ml-2 text-gray-500 dark:text-gray-400">
+        Unlock the Future of Crypto Insights
+      </span>
+    </h1>
+    <div class="flex gap-2 flex-wrap">
+      <button id="theme-btn"
+        onclick="toggleTheme()"
+        class="px-3 py-2 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-lg">
+        🌙
+      </button>
+      <button onclick="handleLogout()"
+        class="px-4 py-2 border rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-sm flex items-center gap-1">
+        🔒 Logout
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Error Banner ───────────────────────────────────────────────────── -->
+  <div id="error-banner"
+    class="hidden mb-4 p-4 bg-red-100 dark:bg-red-900/40 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-300 rounded-lg">
+  </div>
+
+  <!-- ── Login Modal (shown only when ENABLE_LOGIN = True) ─────────────── -->
+  {% if enable_login %}
+  <div id="login-modal"
+    class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-8">
+      <h2 class="text-center text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+        BitTracer
+      </h2>
+      <p class="text-center text-sm text-gray-500 mb-6">Unlock the Future of Crypto Insights</p>
+      <div class="space-y-4">
+        <input id="login-user" type="text" placeholder="User ID"
+          class="w-full border rounded-lg px-4 py-2 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-400" />
+        <input id="login-pass" type="password" placeholder="Password"
+          class="w-full border rounded-lg px-4 py-2 dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-400" />
+        <button onclick="handleLogin()"
+          class="w-full py-2 bg-gradient-to-r from-purple-400 to-pink-600 text-white rounded-lg font-semibold hover:opacity-90 transition">
+          Login
+        </button>
+      </div>
+      <div id="login-error" class="hidden mt-3 text-sm text-red-500 text-center"></div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ── Toolbar ────────────────────────────────────────────────────────── -->
+  <div class="flex flex-wrap gap-2 mb-6">
+    <input id="search-input" type="text" placeholder="Search cryptocurrencies..."
+      oninput="filterCryptoList()"
+      class="flex-grow min-w-[200px] border rounded-lg px-4 py-2 dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-400" />
+
+    <select id="currency-select" onchange="onCurrencyChange()"
+      class="border rounded-lg px-3 py-2 dark:bg-gray-800 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-400">
+      {% for c in currencies %}
+      <option value="{{ c.value }}">{{ c.label }}</option>
+      {% endfor %}
+    </select>
+
+    <button onclick="handleRefresh()" id="refresh-btn"
+      class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 flex items-center gap-2 text-sm">
+      🔄 Refresh
+    </button>
+
+    <select onchange="handleNavigation(this.value)"
+      class="border rounded-lg px-3 py-2 dark:bg-gray-800 dark:border-gray-600 focus:outline-none">
+      <option value="">Navigate</option>
+      <option value="/">Dashboard</option>
+      <option value="/news">Crypto News</option>
+      <option value="/advanced-features">Advanced Features</option>
+      <option value="/general-stats">General Stats</option>
+      <option value="/dashboard-stats">Dashboard Stats</option>
+    </select>
+  </div>
+
+  <!-- ── Summary Charts ─────────────────────────────────────────────────── -->
+  <div id="charts-section" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+
+    <!-- Market Share Pie -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
+      <h2 class="text-lg font-bold mb-1">Market Share</h2>
+      <p class="text-sm text-gray-500 mb-4">Top 5 Cryptocurrencies by Market Cap</p>
+      <div class="relative h-64">
+        <canvas id="market-share-chart"></canvas>
+      </div>
+      <p class="text-sm text-center text-gray-400 mt-3">📈 Market trends</p>
+    </div>
+
+    <!-- Trading Volume Bar -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
+      <h2 class="text-lg font-bold mb-1">Trading Volume</h2>
+      <p class="text-sm text-gray-500 mb-4">Top 5 Cryptocurrencies by 24h Volume</p>
+      <div class="relative h-64">
+        <canvas id="volume-chart"></canvas>
+      </div>
+      <p class="text-sm text-center text-gray-400 mt-3">📈 Volume analysis</p>
+    </div>
+  </div>
+
+  <!-- ── Loading Spinner ────────────────────────────────────────────────── -->
+  <div id="global-spinner" class="flex justify-center items-center py-12">
+    <div class="w-14 h-14 rounded-full border-4 border-purple-500 border-t-transparent animate-spin"></div>
+  </div>
+
+  <!-- ── Tabs: All / Trending ───────────────────────────────────────────── -->
+  <div class="hidden" id="crypto-section">
+    <div class="flex mb-4 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 w-full">
+      <button id="tab-all"
+        onclick="switchTab('all')"
+        class="flex-1 py-2 text-sm font-semibold bg-blue-500 text-white transition">
+        All Cryptocurrencies
+      </button>
+      <button id="tab-trending"
+        onclick="switchTab('trending')"
+        class="flex-1 py-2 text-sm font-semibold bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+        Trending
+      </button>
+    </div>
+
+    <!-- All Coins Grid -->
+    <div id="all-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    </div>
+
+    <!-- Trending Grid -->
+    <div id="trending-grid" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+    </div>
+  </div>
+
+  <!-- ── Coin Detail Panel ──────────────────────────────────────────────── -->
+  <div id="detail-panel" class="hidden mt-8">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
+      <div id="detail-header" class="flex items-center gap-3 mb-6">
+        <img id="detail-img" src="" alt="" class="w-12 h-12" />
+        <h2 id="detail-title" class="text-2xl font-bold"></h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+        <!-- Price Info -->
+        <div>
+          <h3 class="text-lg font-semibold mb-3 text-purple-500">Price Information</h3>
+          <p id="d-price" class="mb-1"></p>
+          <p id="d-change" class="mb-1"></p>
+          <p id="d-ath" class="mb-1"></p>
+          <p id="d-atl" class="mb-1"></p>
+        </div>
+        <!-- Market Info -->
+        <div>
+          <h3 class="text-lg font-semibold mb-3 text-pink-500">Market Information</h3>
+          <p id="d-mcap" class="mb-1"></p>
+          <p id="d-vol" class="mb-1"></p>
+          <p id="d-circ" class="mb-1"></p>
+          <p id="d-total" class="mb-1"></p>
+          <p id="d-max" class="mb-1"></p>
+        </div>
+      </div>
+
+      <!-- Price Change Line Chart -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+          <h3 class="font-semibold mb-2">30-Day Price Change (%)</h3>
+          <canvas id="price-change-chart" height="200"></canvas>
+        </div>
+        <div>
+          <h3 class="font-semibold mb-2">Price vs Market Cap</h3>
+          <canvas id="price-mcap-chart" height="200"></canvas>
+        </div>
+      </div>
+
+      <!-- Volume Distribution Bar Chart -->
+      <div>
+        <h3 class="font-semibold mb-2">Trading Volume Distribution</h3>
+        <canvas id="vol-dist-chart" height="100"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Footer ─────────────────────────────────────────────────────────── -->
+  <footer class="mt-12 py-6 border-t border-gray-200 dark:border-gray-700">
+    <div class="flex flex-col items-center gap-3">
+      <p class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+        convert by gprek
+      </p>
+     
+    </div>
+  </footer>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}
